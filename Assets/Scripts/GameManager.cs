@@ -10,18 +10,6 @@ public class GameManager : MonoBehaviour
     private string countPoints;
     public TextMeshProUGUI markText;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        Debug.Log(countPoints);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        //UpdatePointsText();
-    }
-
     public void UpdatePointsText()
     {
         countPoints = pointP1 + "|" + pointP2;

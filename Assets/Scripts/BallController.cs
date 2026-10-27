@@ -6,40 +6,73 @@ public class BallController : MonoBehaviour
 {
     public float velocity = 10f;
     public GameManager gameManager;
-    private Rigidbody2D _rb;
 
-    // Start is called before the first frame update
+    Rigidbody2D _rb;
+    float _lastHorizontalDirection = 1f;
+
     void Start()
     {
-        _rb = this.gameObject.GetComponent<Rigidbody2D>();
-        LaunchBall();
+        _rb = GetComponent<Rigidbody2D>();
+        LaunchBall(0);
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
+        if (_rb.velocity.magnitude > velocity)
+        {
             _rb.velocity = _rb.velocity.normalized * velocity;
+        }
+
+        if (Mathf.Abs(_rb.velocity.x) >= velocity * 0.3f)
+        {
+            _lastHorizontalDirection = Mathf.Sign(_rb.velocity.x);
+        }
+        else
+        {
+            float yDirection = Mathf.Sign(_rb.velocity.y);
+
+            if (yDirection == 0f)
+            {
+                yDirection = 1f;
+            }
+
+            float minX = 0.3f;
+            float y = Mathf.Sqrt(1f - minX * minX);
+
+            _rb.velocity = new Vector2(_lastHorizontalDirection * minX,yDirection * y) * velocity;
+        }
     }
 
-    void LaunchBall()
+    void LaunchBall(int dir)
     {
-        bool isRight = false;
-        if (Random.value > 0.5f)
+        this.transform.position = new Vector3(0,0,0);
+        if (dir == 0)
         {
-            isRight = true;
+            _lastHorizontalDirection = Random.value > 0.5f ? 1f : -1f;
         }
-        float xVelocity = -1;
-        if(isRight == true)
+        else 
         {
-            xVelocity = 1;
+            _lastHorizontalDirection = dir;
         }
-        float yVelocity = -Random.Range(-1f, 1f);
-        _rb.velocity = new Vector2(xVelocity * velocity, yVelocity * velocity);
+
+        float yVelocity = Random.Range(-0.7f, 0.7f);
+
+        _rb.velocity = new Vector2(_lastHorizontalDirection, yVelocity).normalized * velocity;
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        gameManager.pointP1++;
-        Debug.Log("Ball Hit");
-        gameManager.UpdatePointsText();
+        if (collision.gameObject.CompareTag("Wall_R"))
+        {
+            gameManager.pointP1++;
+            gameManager.UpdatePointsText();
+            LaunchBall(-1);
+        }
+        if(collision.gameObject.CompareTag("Wall_L"))
+        {
+            gameManager.pointP2++;
+            gameManager.UpdatePointsText();
+            LaunchBall(1);
+        }
     }
 }
