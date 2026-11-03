@@ -5,25 +5,39 @@ using UnityEngine;
 public class BallController : MonoBehaviour
 {
     public float velocity = 10f;
+    public float velocityMulty = 1f;
     public GameManager gameManager;
 
+    AudioSource _audioSource;
     Rigidbody2D _rb;
     float _lastHorizontalDirection = 1f;
+
+    public float timeAlive = 0f;
 
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _audioSource = GetComponent<AudioSource>();
         LaunchBall(0);
+    }
+    private void Update()
+    {
+        timeAlive += Time.deltaTime;
+        if (timeAlive > 2f) 
+        {
+            velocityMulty += 0.25f;
+            timeAlive = 0f;
+        }
     }
 
     void FixedUpdate()
     {
-        if (_rb.velocity.magnitude > velocity)
+        if (_rb.velocity.magnitude > velocity * velocityMulty)
         {
-            _rb.velocity = _rb.velocity.normalized * velocity;
+            _rb.velocity = _rb.velocity.normalized * velocity * velocityMulty;
         }
 
-        if (Mathf.Abs(_rb.velocity.x) >= velocity * 0.3f)
+        if (Mathf.Abs(_rb.velocity.x) >= velocity * 0.3f * velocityMulty)
         {
             _lastHorizontalDirection = Mathf.Sign(_rb.velocity.x);
         }
@@ -65,14 +79,16 @@ public class BallController : MonoBehaviour
         if (collision.gameObject.CompareTag("Wall_R"))
         {
             gameManager.pointP1++;
-            gameManager.UpdatePointsText();
             LaunchBall(-1);
+            gameManager.UpdatePointsText();
         }
         if(collision.gameObject.CompareTag("Wall_L"))
         {
             gameManager.pointP2++;
-            gameManager.UpdatePointsText();
             LaunchBall(1);
+            gameManager.UpdatePointsText();
         }
+        _audioSource.pitch = Random.Range(0.8f, 1.2f);
+        _audioSource.Play();
     }
 }
