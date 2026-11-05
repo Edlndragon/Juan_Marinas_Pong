@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BallController : MonoBehaviour
 {
-    public float velocity = 10f;
+    public float ballVelocity = 10f;
     public float velocityMulty = 1f;
     public GameManager gameManager;
 
@@ -22,22 +22,26 @@ public class BallController : MonoBehaviour
     }
     private void Update()
     {
-        timeAlive += Time.deltaTime;
-        if (timeAlive > 2f) 
+        if (timeAlive > 2f && velocityMulty < 2f)
         {
             velocityMulty += 0.25f;
+            ballVelocity *= velocityMulty;
             timeAlive = 0f;
+        }
+        else
+        { 
+            timeAlive += Time.deltaTime;
         }
     }
 
     void FixedUpdate()
     {
-        if (_rb.velocity.magnitude > velocity * velocityMulty)
+        if (_rb.velocity.magnitude > ballVelocity)
         {
-            _rb.velocity = _rb.velocity.normalized * velocity * velocityMulty;
+            _rb.velocity = _rb.velocity.normalized * ballVelocity;
         }
 
-        if (Mathf.Abs(_rb.velocity.x) >= velocity * 0.3f * velocityMulty)
+        if (Mathf.Abs(_rb.velocity.x) >= ballVelocity * 0.3f)
         {
             _lastHorizontalDirection = Mathf.Sign(_rb.velocity.x);
         }
@@ -53,12 +57,16 @@ public class BallController : MonoBehaviour
             float minX = 0.3f;
             float y = Mathf.Sqrt(1f - minX * minX);
 
-            _rb.velocity = new Vector2(_lastHorizontalDirection * minX,yDirection * y) * velocity;
+            _rb.velocity = new Vector2(_lastHorizontalDirection * minX,yDirection * y) * ballVelocity;
         }
     }
 
     void LaunchBall(int dir)
     {
+        velocityMulty = 1f;
+        timeAlive = 0f;
+        ballVelocity = 10f;
+
         this.transform.position = new Vector3(0,0,0);
         if (dir == 0)
         {
@@ -71,7 +79,7 @@ public class BallController : MonoBehaviour
 
         float yVelocity = Random.Range(-0.7f, 0.7f);
 
-        _rb.velocity = new Vector2(_lastHorizontalDirection, yVelocity).normalized * velocity;
+        _rb.velocity = new Vector2(_lastHorizontalDirection, yVelocity).normalized * ballVelocity;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

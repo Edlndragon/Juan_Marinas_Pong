@@ -8,6 +8,9 @@ public class PlayerController : MonoBehaviour
     public float topHeight; //Decide el tope de arriba de los palos
     public float botHeight; //Decide el tope de abajo de los palos
     public bool useArrowKeys = false; //Para decidir que palo se maneja con las teclas de flechas
+    
+    public bool IA;
+    public GameObject ball;
 
     // Start is called before the first frame update
     void Start()
@@ -18,7 +21,18 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        MovePaddle();
+        if (IA == false)
+        {
+            MovePaddle();
+        }
+        else 
+        {
+            MovePaddleIA();
+        }
+    }
+    void MovePaddleIA()
+    {
+
     }
 
     void MovePaddle()

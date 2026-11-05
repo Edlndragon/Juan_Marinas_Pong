@@ -14,12 +14,20 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI markText;
     public AudioClip pointScoreSound;
     public AudioClip winSound;
-    AudioSource _audioSource;
+    public AudioSource _audioSource;
+
+    public GameObject winPanel;
+
+    private void Start()
+    {
+        Time.timeScale = 1.0f;
+    }
     private void Update()
     {
         if (pointP1 >= pointsToWin || pointP2 >= pointsToWin)
         {
-            SceneManager.LoadScene(0);
+            winPanel.SetActive(true);
+            Time.timeScale = 0.0f;
         }
     }
 
